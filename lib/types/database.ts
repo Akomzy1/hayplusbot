@@ -805,6 +805,7 @@ export type Database = {
     }
     Functions: {
       has_signed_disclosure: { Args: never; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       delivery_status: "sent" | "failed" | "bounced"
