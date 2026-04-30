@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* HayPlusbot brand surfaces (HSL, no commas) */
+    --base: 228 2% 5%;                    /* #0A0B0F */
+    --surface: 227 4% 9%;                 /* #12141B */
+    --surface-elevated: 225 6% 13%;       /* #1A1D26 */
+    --brand-teal: 161 69% 37%;            /* #1D9E75 */
+    --brand-coral: 15 68% 52%;            /* #D85A30 */
+    --brand-amber: 35 78% 41%;            /* #BA7517 */
+
+    /* shadcn/ui semantic tokens (dark-mode only product — same values for :root and .dark) */
+    --background: var(--base);
+    --foreground: 210 20% 96%;
+    --card: var(--surface-elevated);
+    --card-foreground: 210 20% 96%;
+    --popover: var(--surface-elevated);
+    --popover-foreground: 210 20% 96%;
+    --primary: 210 20% 96%;
+    --primary-foreground: 228 10% 8%;
+    --secondary: var(--surface);
+    --secondary-foreground: 210 20% 96%;
+    --muted: var(--surface);
+    --muted-foreground: 220 8% 65%;
+    --accent: var(--surface-elevated);
+    --accent-foreground: 210 20% 96%;
+    --destructive: var(--brand-coral);
+    --destructive-foreground: 210 20% 96%;
+    --border: 225 6% 18%;
+    --input: 225 6% 18%;
+    --ring: var(--brand-teal);
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* dark-mode-only product — values mirror :root */
+    --background: var(--base);
+    --foreground: 210 20% 96%;
+    --card: var(--surface-elevated);
+    --card-foreground: 210 20% 96%;
+    --popover: var(--surface-elevated);
+    --popover-foreground: 210 20% 96%;
+    --primary: 210 20% 96%;
+    --primary-foreground: 228 10% 8%;
+    --secondary: var(--surface);
+    --secondary-foreground: 210 20% 96%;
+    --muted: var(--surface);
+    --muted-foreground: 220 8% 65%;
+    --accent: var(--surface-elevated);
+    --accent-foreground: 210 20% 96%;
+    --destructive: var(--brand-coral);
+    --destructive-foreground: 210 20% 96%;
+    --border: 225 6% 18%;
+    --input: 225 6% 18%;
+    --ring: var(--brand-teal);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
