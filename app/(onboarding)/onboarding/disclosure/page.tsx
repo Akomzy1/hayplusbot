@@ -25,7 +25,7 @@ export default async function DisclosurePage() {
           The real three-checkpoint disclosure-signing flow lands in a later
           prompt. Until then, this page is a placeholder that satisfies the
           auth-only gating (you can reach this page once signed in, even if you
-          haven't signed the disclosure).
+          haven&rsquo;t signed the disclosure).
         </p>
         <p className="mt-3">
           Once a server action UPDATEs your{" "}

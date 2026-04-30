@@ -29,7 +29,7 @@ export default function LoginPage({
           aria-live="polite"
           className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive-foreground"
         >
-          That link couldn't be verified. Please log in or request a new one.
+          That link couldn&rsquo;t be verified. Please log in or request a new one.
         </div>
       ) : null}
 
@@ -43,7 +43,7 @@ export default function LoginPage({
           Forgot password?
         </Link>
         <p>
-          Don't have an account?{" "}
+          Don&rsquo;t have an account?{" "}
           <Link href="/signup" className="text-foreground underline-offset-4 hover:underline">
             Sign up
           </Link>

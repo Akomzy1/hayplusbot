@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
           Reset your password
         </h1>
         <p className="text-sm text-muted-foreground">
-          Enter your email and we'll send you a reset link.
+          Enter your email and we&rsquo;ll send you a reset link.
         </p>
       </div>
 
