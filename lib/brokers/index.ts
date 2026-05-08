@@ -15,6 +15,7 @@
 
 import type { BrokerProvider } from "./types";
 import { MockBrokerProvider } from "./mock/provider";
+import { HFMBrokerProvider } from "./hfm/provider";
 
 let cachedProvider: BrokerProvider | null = null;
 
@@ -27,13 +28,14 @@ export function getBrokerProvider(): BrokerProvider {
     case "mock":
       cachedProvider = new MockBrokerProvider();
       break;
-    case "hfm":
-      // Phase 3 Prompt 9 will fill in the HFM provider import.
-      // In v3.4 most HFM provider methods will throw "not yet implemented"
-      // since HFM has no Partner API — that is correct behaviour, not a bug.
-      throw new Error(
-        "HFM provider not yet implemented in this codebase. Run Phase 3 Prompt 9 first.",
-      );
+    case "hfm": {
+      const ibCode = process.env.HFM_IB_CODE;
+      if (!ibCode) {
+        throw new Error("Missing HFM_IB_CODE env var for HFMBrokerProvider");
+      }
+      cachedProvider = new HFMBrokerProvider({ ibCode });
+      break;
+    }
     default:
       throw new Error(`Unknown broker provider: ${providerName}`);
   }
