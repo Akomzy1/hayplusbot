@@ -108,7 +108,7 @@ HayPlusbot/
 │   ├── brokers/                  # Broker-agnostic layer
 │   │   ├── types.ts              # BrokerProvider interface
 │   │   ├── index.ts              # Provider factory
-│   │   ├── mock/                 # MockBrokerProvider (dev only)
+│   │   ├── mock/                 # MockBrokerProvider (test utility + opt-in dev scenarios)
 │   │   │   └── provider.ts
 │   │   └── hfm/                  # HFM implementation skeleton
 │   │       ├── provider.ts       # Most methods throw "not yet implemented" until HFM offers API
@@ -144,7 +144,7 @@ HayPlusbot/
 2. Every broker-specific concept has a corresponding method on the `BrokerProvider` interface.
 3. UI copy referring to "HFM" should come from a config sourced from the active provider, not be hardcoded in components.
 4. When writing tests, use the `MockBrokerProvider`, not a mocked HFM client.
-5. The active provider is selected via `BROKER_PROVIDER` env var (`mock` or `hfm`).
+5. The active provider is selected via `BROKER_PROVIDER` env var. Default for both development and production is `hfm`. `mock` is opt-in for specific test scenarios where you need predictable broker data without external dependencies (Vitest unit tests instantiate `MockBrokerProvider` directly regardless of the env var).
 6. If you're unsure whether something is broker-specific or generic, ask.
 
 ---

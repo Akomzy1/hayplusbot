@@ -22,10 +22,11 @@ The architecture is no longer a compromise. It's the actual industry pattern for
 
 2. **Add broker provider config to `.env.local`:**
    ```
-   BROKER_PROVIDER=mock
-   HFM_IB_CODE=  # fill in when client provides
-   HFM_PARTNER_AREA_URL=https://partners.hfm.com  # informational
+   BROKER_PROVIDER=hfm
+   HFM_IB_CODE=<your client's actual Partner ID from affiliates.hfm.com>
    ```
+   
+   **Why hfm and not mock for local development:** in v3.4 the broker integration is genuinely small — only `signupUrl()` does real work; other methods throw "not yet implemented" because HFM has no Partner API. Using `hfm` locally matches production behaviour exactly, generates real referral URLs with your actual IB code, and surfaces any accidental calls to not-yet-implemented methods immediately rather than letting mock data silently mask them. The `MockBrokerProvider` stays in the codebase as a unit-test utility (Vitest tests instantiate it directly) and as an opt-in for specific scenarios where you need to test broker error states without hitting real services.
 
 3. **Update `.env.example`** to include the new variables.
 
@@ -54,7 +55,7 @@ Build the BrokerProvider interface and a fully functional MockBrokerProvider imp
 
 HayPlusbot's broker integration is abstracted behind a TypeScript interface so HFM can be supplemented with other brokers in future. Per CLAUDE.md, all broker-specific code lives in `lib/brokers/` and is never imported elsewhere — non-broker code only ever uses the interface.
 
-The active provider is selected at runtime via the `BROKER_PROVIDER` environment variable. For Phase 3, we're using `BROKER_PROVIDER=mock` because HFM has no Partner API. The HFM implementation skeleton comes in Prompt 9 — its methods throw "not yet implemented" errors since there's no API to call. The MockBrokerProvider is what makes the rest of the application testable.
+The active provider is selected at runtime via the `BROKER_PROVIDER` environment variable. **Default for both development and production is `hfm`** — this gives you a development environment that matches production behaviour. The `MockBrokerProvider` exists as a development utility for specific testing scenarios (and as the test harness for Vitest unit tests) but is not the default for runtime. In v3.4 with HFM, the HFM provider's only fully-implemented method is `signupUrl()`; other methods throw "not yet implemented" because HFM has no Partner API — those throws are correct behaviour, not bugs.
 
 ## File structure
 
@@ -63,7 +64,7 @@ lib/brokers/
 ├── types.ts                    # BrokerProvider interface + shared types
 ├── index.ts                    # Provider factory: returns active impl based on env
 ├── mock/
-│   └── provider.ts             # MockBrokerProvider — fully functional fake
+│   └── provider.ts             # MockBrokerProvider — used for tests + opt-in dev scenarios
 └── hfm/                        # placeholder folder (Prompt 9 fills this in)
     └── .gitkeep
 ```
@@ -161,7 +162,7 @@ let cachedProvider: BrokerProvider | null = null
 export function getBrokerProvider(): BrokerProvider {
   if (cachedProvider) return cachedProvider
 
-  const providerName = process.env.BROKER_PROVIDER || 'mock'
+  const providerName = process.env.BROKER_PROVIDER || 'hfm'
 
   switch (providerName) {
     case 'mock':
@@ -169,10 +170,10 @@ export function getBrokerProvider(): BrokerProvider {
       break
     case 'hfm':
       // Phase 3 Prompt 9 will fill in the HFM provider import.
-      // Note: HFM provider methods will throw "not yet implemented"
-      // since HFM has no Partner API.
+      // In v3.4 most HFM provider methods will throw "not yet implemented"
+      // since HFM has no Partner API — that is correct behaviour, not a bug.
       throw new Error(
-        'HFM provider not yet implemented. Set BROKER_PROVIDER=mock for now.'
+        'HFM provider not yet implemented in this codebase. Run Phase 3 Prompt 9 first.'
       )
     default:
       throw new Error(`Unknown broker provider: ${providerName}`)
@@ -201,7 +202,7 @@ Add Vitest tests at `lib/brokers/mock/provider.test.ts`:
 
 Update `docs/architecture.md` (create if doesn't exist) with a "Broker Integration" section explaining:
 - The `BrokerProvider` interface pattern
-- Why mock-first is being used in v3.4 (HFM has no Partner API)
+- Why hfm is the default in v3.4 (matches production; mock kept for tests + opt-in dev scenarios)
 - How to swap providers via `BROKER_PROVIDER` env var
 - Where to add tests when implementing new providers
 
@@ -210,7 +211,7 @@ Update `docs/architecture.md` (create if doesn't exist) with a "Broker Integrati
 1. `pnpm typecheck` clean
 2. `pnpm test` — broker tests pass
 3. `pnpm lint` clean
-4. Verify `BROKER_PROVIDER=mock` in `.env.local`
+4. Verify `BROKER_PROVIDER=hfm` and `HFM_IB_CODE` set in `.env.local`. If `HFM_IB_CODE` isn't yet known, you can temporarily set `BROKER_PROVIDER=mock` for this prompt's verification, but you'll need to switch to `hfm` once you have the real Partner ID and certainly before Prompt 11 v2.
 5. Test all account number patterns (starting with 1, 2, 9) produce expected results
 
 ## Suggested commit message
@@ -358,7 +359,7 @@ The interface preserves swap-readiness for this scenario.
 
 Required env var: `HFM_IB_CODE` — your client's HFM IB referral code.
 
-Set `BROKER_PROVIDER=hfm` to activate this provider in production.
+Set `BROKER_PROVIDER=hfm` (the default in v3.4) to activate this provider. Use `mock` only for specific test scenarios.
 ```
 
 ## Tests
@@ -374,9 +375,9 @@ Add tests at `lib/brokers/hfm/provider.test.ts`:
 1. `pnpm typecheck` clean
 2. `pnpm test` — all tests pass including new HFM tests
 3. `pnpm lint` clean
-4. With `BROKER_PROVIDER=mock`, app continues to work normally
-5. With `BROKER_PROVIDER=hfm` and missing env var, clear error message appears
-6. `signupUrl` produces correct URL when called
+4. With `BROKER_PROVIDER=hfm` and valid `HFM_IB_CODE`, `signupUrl()` produces the correct URL with the IB code embedded
+5. With `BROKER_PROVIDER=hfm` and missing `HFM_IB_CODE`, clear error message appears at app startup
+6. With `BROKER_PROVIDER=mock`, app falls back to mock data (this is the opt-in path for testing scenarios)
 
 ## Suggested commit message
 

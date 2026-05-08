@@ -117,7 +117,7 @@ Methods removed compared to v2.2:
 
 The HFM implementation lives at `lib/brokers/hfm/provider.ts`. Shared types at `lib/brokers/types.ts`.
 
-A `MockBrokerProvider` is built and used during development (Phase 3 Prompt 8). The mock provides deterministic test data for all interface methods, making the rest of the application testable without HFM dependencies.
+A `MockBrokerProvider` is built alongside the real implementation (Phase 3 Prompt 8). The mock provides deterministic test data for all interface methods, used as the test harness for Vitest unit tests and as an opt-in for development scenarios where the real broker would be inconvenient. Default runtime configuration in v3.4 uses the HFM provider directly — this matches production behaviour and surfaces any accidental calls to not-yet-implemented methods immediately.
 
 ### 6.3 HFM as the current broker
 
